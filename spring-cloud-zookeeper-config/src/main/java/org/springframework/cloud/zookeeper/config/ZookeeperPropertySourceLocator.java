@@ -103,6 +103,18 @@ public class ZookeeperPropertySourceLocator implements PropertySourceLocator {
 			this.contexts.add(baseContext.toString());
 			addProfiles(this.contexts, baseContext.toString(), profiles);
 
+			log.info("Trying to load tenants");
+			String tenantName = env.getProperty("spring.cloud.zookeeper.tenant");
+			if (tenantName != null && tenantName.length() != 0) {
+				if (!tenantName.startsWith("/")) {
+					baseContext.append("/");
+				}
+				baseContext.append(tenantName);
+				this.contexts.add(baseContext.toString());
+				addProfiles(this.contexts, baseContext.toString(), profiles);
+				log.debug("spring.cloud.zookeeper.tenant: " + tenantName + " is added to the contexts.");
+			}
+
 			CompositePropertySource composite = new CompositePropertySource("zookeeper");
 
 			Collections.reverse(this.contexts);
